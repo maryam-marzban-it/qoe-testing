@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -17,13 +17,16 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: 📦 Install dependencies
         run: npm ci
 
       - name: 🎭 Install Playwright browsers
         run: npx playwright install --with-deps chromium
+
+      - name: 🚀 Start web server
+        run: npm run start & npx wait-on http://localhost:3000
 
       - name: 💨 Run Smoke Tests
         run: npx playwright test tests/smoke/
