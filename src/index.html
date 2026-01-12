@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Live Arena - QoE Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+      body {
+        background: #1a1a2e;
+        color: white;
+        font-family: Arial;
+        padding: 20px;
+      }
+      video {
+        width: 100%;
+        max-width: 800px;
+        background: #000;
+      }
+      #metrics {
+        background: #16213e;
+        padding: 15px;
+        margin-top: 20px;
+      }
+      .metric {
+        display: inline-block;
+        margin: 10px 20px;
+      }
+      .value {
+        font-size: 24px;
+        color: #00d4ff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎬 Live Arena QoE Test</h1>
+    <video id="video" controls></video>
+
+    <div id="metrics">
+      <div class="metric">
+        <div class="value" id="startup">--</div>
+        <div>Startup (ms)</div>
+      </div>
+      <div class="metric">
+        <div class="value" id="rebuffer">0</div>
+        <div>Rebuffers</div>
+      </div>
+    </div>
+
+    <script>
+      const video = document.getElementById("video");
+      const startTime = Date.now();
+      let rebufferCount = 0;
+
+      video.addEventListener("playing", () => {
+        const startup = Date.now() - startTime;
+        document.getElementById("startup").textContent = startup;
+        console.log(`PLAYING ✅ (startup: ${startup}ms)`);
+      });
+
+      video.addEventListener("waiting", () => {
+        rebufferCount++;
+        document.getElementById("rebuffer").textContent = rebufferCount;
+        console.log(`BUFFERING ⏳ (count: ${rebufferCount})`);
+      });
+
+      // Test video (public stream)
+      const testStream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(testStream);
+        hls.attachMedia(video);
+      } else {
+        video.src = testStream;
+      }
+    </script>
+  </body>
+</html>

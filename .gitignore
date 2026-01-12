@@ -1,0 +1,12 @@
+node_modules/
+test-results/
+playwright-report/
+playwright/.cache/
+*.log
+.env
+.DS_Store
+# Large video files
+*.mp4
+*.mkv
+*.avi
+stream/

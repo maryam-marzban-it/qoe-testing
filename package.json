@@ -1,0 +1,17 @@
+{
+  "name": "qoe-testing-project",
+  "version": "1.0.0",
+  "description": "QoE Testing for Live Arena",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/smoke/",
+    "test:e2e": "playwright test tests/e2e/",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0"
+  },
+  "author": "Maryam",
+  "license": "ISC"
+}

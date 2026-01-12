@@ -1,0 +1,89 @@
+# Azure DevOps Pipeline för QoE Testing
+trigger:
+  - main
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+  # STAGE 1: INSTALL
+  - stage: Install
+    displayName: "📦 Install"
+    jobs:
+      - job: InstallJob
+        displayName: "Install dependencies"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+            displayName: "Install Node.js"
+
+          - script: npm ci
+            displayName: "Install npm packages"
+
+          - script: npx playwright install --with-deps chromium
+            displayName: "Install Playwright browser"
+
+  # STAGE 2: SMOKE TESTS
+  - stage: SmokeTests
+    displayName: "💨 Smoke Tests"
+    dependsOn: Install
+    jobs:
+      - job: SmokeJob
+        displayName: "Run smoke tests"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+
+          - script: npm ci
+            displayName: "Install packages"
+
+          - script: npx playwright install --with-deps chromium
+            displayName: "Install browser"
+
+          - script: npx playwright test tests/smoke/ --reporter=junit,html
+            displayName: "Run Smoke Tests"
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "**/junit.xml"
+              testRunTitle: "Smoke Tests"
+
+  # STAGE 3: E2E TESTS
+  - stage: E2ETests
+    displayName: "🎭 E2E Tests"
+    dependsOn: SmokeTests
+    jobs:
+      - job: E2EJob
+        displayName: "Run E2E tests"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+
+          - script: npm ci
+            displayName: "Install packages"
+
+          - script: npx playwright install --with-deps chromium
+            displayName: "Install browser"
+
+          - script: npx playwright test tests/e2e/ --reporter=junit,html
+            displayName: "Run E2E Tests"
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "**/junit.xml"
+              testRunTitle: "E2E Tests"
+
+          - task: PublishBuildArtifacts@1
+            condition: always()
+            inputs:
+              pathToPublish: "playwright-report"
+              artifactName: "playwright-report"
