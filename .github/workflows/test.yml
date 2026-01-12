@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -17,7 +17,7 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: 📦 Install dependencies
         run: npm install
@@ -25,8 +25,11 @@ jobs:
       - name: 🎭 Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: 🧪 Run tests
-        run: npx playwright test
+      - name: 🚀 Start server and run tests
+        run: |
+          npx serve src -l 3000 &
+          sleep 5
+          npx playwright test
 
       - name: 📊 Upload test report
         if: always()
